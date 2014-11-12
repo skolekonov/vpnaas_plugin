@@ -1,0 +1,4 @@
+vpnaas-plugin
+============
+
+Plugin description
