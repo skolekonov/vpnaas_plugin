@@ -43,26 +43,18 @@
 # [*ipsec_status_check_interval*]
 #   (optional) Status check interval. Defaults to '60'.
 #
-class neutron::agents::vpnaas (
+class vpnaas::agent (
   $package_ensure              = present,
   $enabled                     = true,
   $manage_service              = true,
   $vpn_device_driver           = 'neutron.services.vpn.device_drivers.ipsec.OpenSwanDriver',
   $interface_driver            = 'neutron.agent.linux.interface.OVSInterfaceDriver',
   $external_network_bridge     = undef,
-  $ipsec_status_check_interval = '60'
+  $ipsec_status_check_interval = '60',
 ) {
 
-  include neutron::params
+  include vpnaas::params
 
-  service { 'disable-neutron-l3-service':
-    ensure  => stopped,
-    name    => "neutron-l3-agent",
-    enable  => false,
-  }
-
-  Service['disable-neutron-l3-service'] -> Service['neutron-vpnaas-service']
-  Neutron_config<||>              ~> Service['neutron-vpnaas-service']
   Neutron_vpnaas_agent_config<||> ~> Service['neutron-vpnaas-service']
 
   case $vpn_device_driver {
@@ -70,7 +62,7 @@ class neutron::agents::vpnaas (
       Package['openswan'] -> Package<| title == 'neutron-vpnaas-agent' |>
       package { 'openswan':
         ensure => present,
-        name   => $::neutron::params::openswan_package,
+        name   => $::vpnaas::params::openswan_package,
       }
     }
     default: {
@@ -97,15 +89,15 @@ class neutron::agents::vpnaas (
     }
   }
 
-  if $::neutron::params::vpnaas_agent_package {
-    Package['neutron']            -> Package['neutron-vpnaas-agent']
+  if $::vpnaas::params::vpnaas_agent_package {
+#    Package['neutron']            -> Package['neutron-vpnaas-agent']
     Package['neutron-vpnaas-agent'] -> Neutron_vpnaas_agent_config<||>
     package { 'neutron-vpnaas-agent':
       ensure  => $package_ensure,
-      name    => $::neutron::params::vpnaas_agent_package,
+      name    => $::vpnaas::params::vpnaas_agent_package,
     }
-  } else {
-    Package['neutron'] -> Neutron_vpnaas_agent_config<||>
+#  } else {
+#    Package['neutron'] -> Neutron_vpnaas_agent_config<||>
   }
 
   if $manage_service {
@@ -118,7 +110,7 @@ class neutron::agents::vpnaas (
 
   service { 'neutron-vpnaas-service':
     ensure  => $service_ensure,
-    name    => $::neutron::params::vpnaas_agent_service,
+    name    => $::vpnaas::params::vpnaas_agent_service,
     enable  => $enabled,
   }
 }
