@@ -1,3 +1,3 @@
-include vpnaas
-include vpnaas_ha
+#include vpnaas
+#include vpnaas::ha
 include vpnaas::common
