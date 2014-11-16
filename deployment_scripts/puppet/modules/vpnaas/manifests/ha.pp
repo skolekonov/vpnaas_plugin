@@ -1,4 +1,4 @@
-class vpnaas_ha {
+class vpnaas::ha {
 
     include vpnaas::params
 
@@ -17,7 +17,7 @@ class vpnaas_ha {
       command => "pcs resource delete p_neutron-l3-agent"
     }
 
-    file { "${l3_agent_ocf_file}":
+    file { "${vpnaas::params::l3_agent_ocf_file}":
       mode   => 644,
       owner  => root,
       group  => root,
