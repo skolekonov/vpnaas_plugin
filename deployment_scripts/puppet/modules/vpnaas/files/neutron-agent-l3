@@ -17,7 +17,7 @@
 # OCF instance parameters:
 #   OCF_RESKEY_binary
 #   OCF_RESKEY_config
-#   OCF_RESKEY_l3_config
+#   OCF_RESKEY_plugin_config
 #   OCF_RESKEY_vpn_config
 #   OCF_RESKEY_user
 #   OCF_RESKEY_pid
@@ -39,7 +39,7 @@ OCF_RESKEY_binary_default="neutron-vpn-agent"
 OCF_RESKEY_config_default="/etc/neutron/neutron.conf"
 OCF_RESKEY_keystone_config_default="/etc/keystone/keystone.conf"
 OCF_RESKEY_vpn_config_default="/etc/neutron/vpn_agent.ini"
-OCF_RESKEY_l3_config_default="/etc/neutron/l3_agent.ini"
+OCF_RESKEY_plugin_config_default="/etc/neutron/l3_agent.ini"
 OCF_RESKEY_log_file_default="/var/log/neutron/vpn-agent.log"
 OCF_RESKEY_user_default="neutron"
 OCF_RESKEY_pid_default="${HA_RSCTMP}/${__SCRIPT_NAME}/${__SCRIPT_NAME}.pid"
@@ -60,7 +60,7 @@ OCF_RESKEY_debug_default=false
 : ${OCF_RESKEY_binary=${OCF_RESKEY_binary_default}}
 : ${OCF_RESKEY_config=${OCF_RESKEY_config_default}}
 : ${OCF_RESKEY_keystone_config=${OCF_RESKEY_keystone_config_default}}
-: ${OCF_RESKEY_l3_config=${OCF_RESKEY_l3_config_default}}
+: ${OCF_RESKEY_plugin_config=${OCF_RESKEY_plugin_config_default}}
 : ${OCF_RESKEY_vpn_config=${OCF_RESKEY_vpn_config_default}}
 : ${OCF_RESKEY_user=${OCF_RESKEY_user_default}}
 : ${OCF_RESKEY_pid=${OCF_RESKEY_pid_default}}
@@ -128,12 +128,12 @@ Location of the Keystone configuration file
 <content type="string" default="${OCF_RESKEY_keystone_config_default}" />
 </parameter>
 
-<parameter name="l3_config" unique="0" required="0">
+<parameter name="plugin_config" unique="0" required="0">
 <longdesc lang="en">
 Location of the OpenStack L3 Service (neutron-l3-agent) configuration file
 </longdesc>
 <shortdesc lang="en">OpenStack Router (neutron-l3-agent) config file</shortdesc>
-<content type="string" default="${OCF_RESKEY_l3_config_default}" />
+<content type="string" default="${OCF_RESKEY_plugin_config_default}" />
 </parameter>
 
 <parameter name="vpn_config" unique="0" required="0">
@@ -464,7 +464,7 @@ neutron_l3_agent_start() {
     # run and detach to background agent as daemon.
     # Don't use ocf_run as we're sending the tool's output to /dev/null
     su ${OCF_RESKEY_user} -s /bin/sh -c "${OCF_RESKEY_binary} --config-file=$OCF_RESKEY_config \
-        --config-file=$OCF_RESKEY_l3_config --config-file=$OCF_RESKEY_vpn_config --log-file=$OCF_RESKEY_log_file $OCF_RESKEY_additional_parameters \
+        --config-file=$OCF_RESKEY_plugin_config --config-file=$OCF_RESKEY_vpn_config --log-file=$OCF_RESKEY_log_file $OCF_RESKEY_additional_parameters \
         >> /dev/null"' 2>&1 & echo \$! > $OCF_RESKEY_pid'
     ocf_log debug "Create pid file: ${OCF_RESKEY_pid} with content $(cat ${OCF_RESKEY_pid})"
 

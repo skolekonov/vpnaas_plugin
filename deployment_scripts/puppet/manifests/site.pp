@@ -1,3 +1,2 @@
-#include vpnaas
-#include vpnaas::ha
-include vpnaas::common
+if $cluster_mode == 'ha_compact' { include vpnaas::ha }
+else { include vpnaas }

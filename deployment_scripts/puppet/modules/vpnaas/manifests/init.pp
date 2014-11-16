@@ -16,5 +16,5 @@ class vpnaas {
     Service['disable-neutron-l3-service'] -> Class['vpnaas::agent']
 
     class {'vpnaas::agent':}
-    class {'vpnaas::common':}
+#    class {'vpnaas::common':}
 }
