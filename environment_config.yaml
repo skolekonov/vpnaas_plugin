@@ -1,7 +1,7 @@
 attributes:
   vpnaas-plugin:
-    value: 'Enable plugin'
+#    value:
 #    label: 'Text field'
 #    description: 'Description for text field'
-#    weight: 25
+    weight: 25
 #    type: "text"

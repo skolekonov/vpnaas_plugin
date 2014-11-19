@@ -35,4 +35,5 @@ class vpnaas::params {
   $l3_agent_ocf_file   = '/etc/puppet/modules/cluster/files/ocf/neutron-agent-l3'
   $cleanup_script_file = '/etc/puppet/modules/cluster/files/q-agent-cleanup.py'
   $neutron_params_file = '/etc/puppet/modules/neutron/manifests/params.pp'
+  $l3_manifest_file    = '/etc/puppet/modules/neutron/manifests/agents/l3.pp'
 }
