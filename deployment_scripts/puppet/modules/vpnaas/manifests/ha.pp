@@ -4,21 +4,21 @@ class vpnaas::ha {
     include neutron::params
 
 
-    $fuel_settings = parseyaml($astute_settings_yaml)
-    $access_hash = $fuel_settings['access']
-    $neutron_config = $fuel_settings['quantum_settings']
-    $primary      = true
-    $multiple_agents = true
+    $fuel_settings      = parseyaml($astute_settings_yaml)
+    $access_hash        = $fuel_settings['access']
+    $neutron_config     = $fuel_settings['quantum_settings']
+    $primary            = true
+    $multiple_agents    = true
     $primary_controller = $fuel_settings['role'] ? { 'primary-controller'=>true, default=>false }
 
     $metadata_port            = 8775
     $send_arp_for_ha          = 8
     $external_network_bridge  = 'br-ex'
 
-    $debug           = true
-    $verbose         = true
-    $syslog          = $::use_syslog
-    $plugin_config   = '/etc/neutron/l3_agent.ini'
+    $debug                    = true
+    $verbose                  = true
+    $syslog                   = $::use_syslog
+    $plugin_config            = '/etc/neutron/l3_agent.ini'
 
     package { 'neutron':
       ensure => present,
@@ -26,12 +26,11 @@ class vpnaas::ha {
     }
 
     class {'openstack::network::neutron_agents':
-      agents    => ['l3'],
-      ha_agents => $primary_controller ? {true => 'primary', default => 'slave'},
-      verbose   => $verbose,
-      debug     => $debug,
-      shared_secret => undef,
-
+      agents            => ['l3'],
+      ha_agents         => $primary_controller ? {true => 'primary', default => 'slave'},
+      verbose           => $verbose,
+      debug             => $debug,
+      shared_secret     => undef,
       admin_password    => $neutron_config['keystone']['admin_password'],
       admin_tenant_name => 'services',
       admin_username    => $access_hash[user],
@@ -51,7 +50,7 @@ class vpnaas::ha {
                  },
     }
 
-  if ! $multiple_agents {
+    if ! $multiple_agents {
       cs_colocation { 'l3-keepaway-dhcp':
         ensure     => present,
         score      => '-100',
@@ -61,15 +60,14 @@ class vpnaas::ha {
         ],
         require => Cluster::Corosync::Cs_service['l3'],
       }
-  }
+    }
 
-    File["${vpnaas::params::l3_agent_ocf_file}"] ->
-    Class['openstack::network::neutron_agents'] -> Cluster::Corosync::Cs_with_service['l3-and-ovs'] ->
-    Class['vpnaas::common']
+    File["${vpnaas::params::l3_agent_ocf_file}"]     -> Class['openstack::network::neutron_agents'] ->
+    Cluster::Corosync::Cs_with_service['l3-and-ovs'] -> Class['vpnaas::common']
 
     if ! $primary_controller {
       exec {'waiting-for-vpn-agent':
-        tries     => 90,
+        tries     => 10,
         try_sleep => 60,
         command   => "pcs resource show p_neutron-vpn-agent > /dev/null 2>&1",
         path      => '/usr/sbin:/usr/bin:/sbin:/bin',

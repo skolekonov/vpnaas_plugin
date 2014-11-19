@@ -1,4 +1,4 @@
-vpnaas-plugin
+VPNaaS plugin
 ============
 
-Plugin description
+VPNaaS (VPN-as-a-Service) is a Neutron extension that introduces VPN feature set.

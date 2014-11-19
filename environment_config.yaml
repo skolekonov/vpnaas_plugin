@@ -1,7 +1,6 @@
 attributes:
-  vpnaas-plugin:
-#    value:
-#    label: 'Text field'
-#    description: 'Description for text field'
-    weight: 25
-#    type: "text"
+  # Show vpnaas only for neutron
+  metadata:
+    restrictions:
+      - condition: cluster:net_provider != 'neutron'
+        action: hide

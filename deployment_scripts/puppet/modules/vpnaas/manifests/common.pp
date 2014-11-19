@@ -1,5 +1,3 @@
-#
-
 class vpnaas::common {
 
     include vpnaas::params

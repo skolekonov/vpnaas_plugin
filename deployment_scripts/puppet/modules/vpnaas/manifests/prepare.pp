@@ -1,12 +1,13 @@
 class vpnaas::prepare {
-    include vpnaas::params
-    $fuel_settings = parseyaml($astute_settings_yaml)
-    $primary_controller = $fuel_settings['role'] ? { 'primary-controller'=>true, default=>false }
 
+    include vpnaas::params
+
+    $fuel_settings      = parseyaml($astute_settings_yaml)
+    $primary_controller = $fuel_settings['role'] ? { 'primary-controller'=>true, default=>false }
 
     exec { "remove-server-deps":
       path    => "/usr/bin:/usr/sbin:/bin",
-      command => 'sed "s/require => Class\[\'neutron\'\],/#require => Class\[\'neutron\'\],/g" -i /etc/puppet/modules/neutron/manifests/agents/l3.pp'
+      command => "sed \"s/require => Class\[\'neutron\'\],/#require => Class\[\'neutron\'\],/g\" -i $vpnaas::params::l3_manifest_file"
     }
 
     exec { "patch-neutron-params":
@@ -27,8 +28,18 @@ class vpnaas::prepare {
     if $primary_controller {
       exec { "remove-l3-agent":
         path    => "/sbin:/usr/bin:/usr/sbin:/bin",
-        command => "pcs resource delete p_neutron-l3-agent",
+        command => "pcs resource delete p_neutron-l3-agent --wait=120",
       }
       Exec['remove-l3-agent'] -> Class['vpnaas::agent']
+    }
+    else {
+      exec {'waiting-for-l3-deletion':
+        tries     => 5,
+        try_sleep => 30,
+        command   => "pcs resource show p_neutron-l3-agent > /dev/null 2>&1",
+        path      => '/usr/sbin:/usr/bin:/sbin:/bin',
+        returns   => [1],
+      }
+      Exec['waiting-for-l3-deletion'] -> Class['vpnaas::agent']
     }
 }

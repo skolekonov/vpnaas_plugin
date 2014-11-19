@@ -1,11 +1,11 @@
 # Plugin name
 name: vpnaas-plugin
 # Human-readable name for your plugin
-title: Enable VPNaaS
+title: VPNaaS plugin for Neutron
 # Plugin version
 version: 1.0.0
 # Description
-description: Use VPNaaS plugin for Neutron
+description: Neutron extension that introduces VPN feature set
 # Required fuel version
 fuel_version: ['6.0']
 
